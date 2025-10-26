@@ -4,7 +4,7 @@
 
 ## ssh into our VM and start the new image
 
-name: Continuous Deployment (Prod) (Backend)
+name: Continuous Deployment (Prod) (frontend)
 on:
   push:
     branches: [ main ]
