@@ -15,7 +15,7 @@ COPY ./apps/backend ./apps/backend
 ENV DATABASE_URL=${DATABASE_URL}
 
 RUN bun install
-RUN bun run db:generate
+
 
 EXPOSE 8080
 
