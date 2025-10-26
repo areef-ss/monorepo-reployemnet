@@ -13,6 +13,11 @@ ARG DATABASE_URL
 ENV DATABASE_URL=${DATABASE_URL}
 
 RUN bun install
+
+
+RUN apt-get update -y && apt-get install -y openssl
+
+
 RUN bun run generate:db
 
 EXPOSE 8080

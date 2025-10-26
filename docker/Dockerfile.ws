@@ -16,6 +16,9 @@ COPY ./apps/websockets ./apps/websockets
 # Install dependencies
 RUN bun install
 
+RUN apt-get update -y && apt-get install -y openssl
+
+
 # ✅ Prisma generate needs DATABASE_URL
 RUN bun run generate:db
 
