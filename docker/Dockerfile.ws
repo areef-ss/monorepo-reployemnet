@@ -12,7 +12,7 @@ COPY ./turbo.json ./turbo.json
 COPY ./apps/websockets ./apps/websockets
 
 RUN bun install
-RUN bun run db:generate
+RUN bun run generate:db
 
 
 EXPOSE 8081
