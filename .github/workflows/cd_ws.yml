@@ -28,4 +28,4 @@ jobs:
           file: ./docker/Dockerfile.ws
           build-args: DATABASE_URL=${{ secrets.DATABASE_URL }}
           push: true
-          tags: areefs25/user-app-fs:${{ github.sha }}
+          tags: areefs25/user-app-ws:${{ github.sha }}
