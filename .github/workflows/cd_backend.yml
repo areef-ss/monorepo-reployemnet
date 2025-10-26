@@ -37,14 +37,14 @@ jobs:
           echo "$SSH_KEY" | tr -d '\r' > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
           touch ~/.ssh/known_hosts
-          ssh-keyscan -H ip-172-31-3-140 >> ~/.ssh/known_hosts
+          ssh-keyscan -H ip-13.53.218.55 >> ~/.ssh/known_hosts
         env:
           SSH_KEY: ${{ secrets.SSH_KEY }}
 
       # 5️⃣ SSH into VM and deploy Docker container
       - name: Deploy Docker container
         run: |
-          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ubuntu@ip-172-31-3-140 \
+          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ubuntu@13.53.218.55 \
             "docker stop user_backend || true && \
              docker rm user_backend || true && \
              docker run --name user_backend -d -p 8080:8080 areefs25/user-app-backend:${{ github.sha }}"
