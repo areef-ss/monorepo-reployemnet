@@ -1,27 +1,27 @@
-## Build the dokcer code
-
-## Push the docker image to the registry
-
-## ssh into our VM and start the new image
-
 name: Continuous Deployment (Prod) (Backend)
+
 on:
   push:
     branches: [ main ]
+
 jobs:
-  build:
+  build-and-deploy:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout the code
+      # 1️⃣ Checkout the repository
+      - name: Checkout code
         uses: actions/checkout@v2
-  
+
+      # 2️⃣ Log in to Docker Hub
       - name: Docker login
         uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-      
-      - name: Build and push
+
+      # 3️⃣ Build and push Docker image
+      - name: Build and push Docker image
         uses: docker/build-push-action@v4
         with:
           context: .
@@ -29,11 +29,22 @@ jobs:
           build-args: DATABASE_URL=${{ secrets.DATABASE_URL }}
           push: true
           tags: areefs25/user-app-backend:${{ github.sha }}
-      - name: Deploy
-        run: echo "${{ secrets.SSH_PRIVATE_KEY }}" &> ~/ssh_key
-          mkdir -p /home/runner/.ssh
-          ls /home/runner/.ssh
-          touch /home/runner/.ssh/known_hosts
-          echo "${{ secrets.KNOWN_HOSTS }}" &> /home/runner/.ssh/known_hosts
-          chmod 700 /home/runner/ssh_key
-          ssh -o StrictHostKeyChecking=no -i ~/ssh_key ubuntu@ip-172-31-3-140 -t "docker stop user_backend && docker run --name user_backend -d -p 8080:8080 areefs25/user-app-backend:${{ github.sha }}"
+
+      # 4️⃣ Setup SSH key for deployment
+      - name: Setup SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo "$SSH_KEY" | tr -d '\r' > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          touch ~/.ssh/known_hosts
+          ssh-keyscan -H ip-172-31-3-140 >> ~/.ssh/known_hosts
+        env:
+          SSH_KEY: ${{ secrets.SSH_KEY }}
+
+      # 5️⃣ SSH into VM and deploy Docker container
+      - name: Deploy Docker container
+        run: |
+          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ubuntu@ip-172-31-3-140 \
+            "docker stop user_backend || true && \
+             docker rm user_backend || true && \
+             docker run --name user_backend -d -p 8080:8080 areefs25/user-app-backend:${{ github.sha }}"
